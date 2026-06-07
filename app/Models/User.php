@@ -49,19 +49,24 @@ class User extends Authenticatable
     }
 
     // Helper method untuk memeriksa apakah pengguna memiliki peran tertentu
-    public function isAdmin()
+    public function isAdmin(): bool
     {
-        return $this->role && $this->role->name === 'admin';
+        return $this->role?->name === 'admin';
     }
 
-    public function isEditor()
+    public function isEditor(): bool
     {
-        return $this->role && $this->role->name === 'editor';
+        return $this->role?->name === 'editor';
     }
 
-    public function isWriter()
+    public function isWriter(): bool
     {
-        return $this->role && $this->role->name === 'writer';
+        return $this->role?->name === 'writer';
+    }
+
+    public function isReader(): bool
+    {
+        return $this->role?->name === 'reader';
     }
 
 }
