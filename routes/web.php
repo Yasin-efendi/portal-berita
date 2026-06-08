@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
 
+use App\Http\Controllers\Web\PublicPostController;
+
 // TEMPORARY: Route untuk testing Gate yang lebih akurat
 Route::middleware(['auth'])->group(function () {
     Route::get('/test-gate', function () {
@@ -34,9 +36,13 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+// Halaman publik (letakkan di atas route auth)
+Route::get('/', [PublicPostController::class, 'index'])->name('home');
+Route::get('/post/{slug}', [PublicPostController::class, 'show'])->name('post.show');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
