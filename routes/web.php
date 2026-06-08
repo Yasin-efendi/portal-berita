@@ -5,18 +5,32 @@ use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
 
-// TEMPORARY: Route untuk testing Gate (akan dihapus nanti)
+// TEMPORARY: Route untuk testing Gate yang lebih akurat
 Route::middleware(['auth'])->group(function () {
     Route::get('/test-gate', function () {
-        // Buat post dummy untuk testing (tidak akan disimpan ke database)
-        $dummyPost = new Post();
-        $dummyPost->author_id = Auth::id(); // Set author_id ke user yang sedang login
+        $currentUser = Auth::user();
         
-        $canUpdate = Gate::allows('update-post', $dummyPost);
-        $canDelete = Gate::allows('delete-post', $dummyPost);
+        // SKENARIO 1: Artikel milik sendiri
+        $myPost = new Post();
+        $myPost->author_id = $currentUser->id;
         
-        return view('test-gate', compact('canUpdate', 'canDelete'));
+        // SKENARIO 2: Artikel milik user lain (ambil user pertama yang bukan dirinya)
+        $otherUser = User::where('id', '!=', $currentUser->id)->first();
+        $otherPost = new Post();
+        $otherPost->author_id = $otherUser ? $otherUser->id : 999; // 999 = tidak ada user
+        
+        $canUpdateMyPost = Gate::allows('update-post', $myPost);
+        $canUpdateOtherPost = Gate::allows('update-post', $otherPost);
+        $canDelete = Gate::allows('delete-post', $myPost);
+        
+        return view('test-gate', compact(
+            'canUpdateMyPost', 
+            'canUpdateOtherPost', 
+            'canDelete',
+            'currentUser'
+        ));
     });
 });
 

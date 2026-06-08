@@ -9,38 +9,46 @@ use App\Models\User;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         // Gate untuk mengedit artikel
         Gate::define('update-post', function (User $user, Post $post) {
-            // Admin dan editor bisa edit semua artikel
-            if ($user->isAdmin() || $user->isEditor()) {
+            // ADMIN: bisa edit semua artikel
+            if ($user->isAdmin()) {
                 return true;
             }
-            // Writer hanya bisa edit artikel miliknya sendiri
-            return $user->id === $post->author_id;
+            
+            // EDITOR: bisa edit semua artikel
+            if ($user->isEditor()) {
+                return true;
+            }
+            
+            // WRITER: hanya bisa edit artikel miliknya sendiri
+            if ($user->isWriter() && $user->id === $post->author_id) {
+                return true;
+            }
+            
+            // READER atau role lain: TIDAK BISA
+            return false;
         });
 
         // Gate untuk menghapus artikel
         Gate::define('delete-post', function (User $user, Post $post) {
             // Hanya admin yang bisa hapus artikel
-            return $user->isAdmin();
+            if ($user->isAdmin()) {
+                return true;
+            }
+            
+            return false;
         });
 
         // Gate untuk approve komentar
         Gate::define('approve-comment', function (User $user) {
-            // Admin dan editor bisa approve komentar
             return $user->isAdmin() || $user->isEditor();
         });
     }
