@@ -42,7 +42,7 @@
                     
                     <!-- Konten Artikel -->
                     <div class="prose max-w-none">
-                        {!! nl2br(e($post->content)) !!}
+                        {!! $post->content !!}
                     </div>
                     
                 </div>
