@@ -17,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Gate untuk mengedit artikel
-        Gate::define('update-post', function (User $user, Post $post) {
+        Gate::define('update-post', function (User $user, ?Post $post = null) {
             // ADMIN: bisa edit semua artikel
             if ($user->isAdmin()) {
                 return true;
@@ -28,9 +28,14 @@ class AppServiceProvider extends ServiceProvider
                 return true;
             }
             
-            // WRITER: hanya bisa edit artikel miliknya sendiri
-            if ($user->isWriter() && $user->id === $post->author_id) {
-                return true;
+            // WRITER: 
+            if ($user->isWriter()) {
+                // Jika tidak ada post spesifik (untuk menampilkan menu di dashboard)
+                if ($post === null) {
+                    return true;  // Writer boleh melihat menu "Kelola Artikel"
+                }
+                // Jika ada post spesifik (untuk edit artikel tertentu)
+                return $user->id === $post->author_id;
             }
             
             // READER atau role lain: TIDAK BISA
@@ -38,10 +43,15 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Gate untuk menghapus artikel
-        Gate::define('delete-post', function (User $user, Post $post) {
+        Gate::define('delete-post', function (User $user, ?Post $post = null) {
             // Hanya admin yang bisa hapus artikel
             if ($user->isAdmin()) {
                 return true;
+            }
+            
+            // Untuk keperluan menu dashboard (menampilkan menu untuk admin saja)
+            if ($post === null) {
+                return false;  // Non-admin tidak boleh lihat menu hapus di dashboard
             }
             
             return false;
