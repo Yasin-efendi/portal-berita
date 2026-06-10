@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\User;
 
 use App\Http\Controllers\Web\PublicPostController;
+// use App\Livewire\Admin\TestDashboard;
 
 // TEMPORARY: Route untuk testing Gate yang lebih akurat
 Route::middleware(['auth'])->group(function () {
@@ -43,6 +44,21 @@ Route::middleware(['auth'])->group(function () {
 // Halaman publik (letakkan di atas route auth)
 Route::get('/', [PublicPostController::class, 'index'])->name('home');
 Route::get('/post/{slug}', [PublicPostController::class, 'show'])->name('post.show');
+
+// Route::middleware(['auth', 'role:admin,editor,writer'])->group(function () {
+//     Route::get('/test-livewire', function () {
+//         // Arahkan ke path components, dan jangan lupa awalan ⚡
+//         return view('components.admin.⚡test-dashboard'); 
+//     });
+// });
+
+Route::middleware(['auth', 'role:admin,editor,writer'])->group(function () {
+    // Gunakan Route::livewire() dan namespace admin::
+    Route::livewire('/test-livewire', 'admin.test-dashboard');
+
+    // Route untuk create post
+    Route::livewire('admin/posts/create', 'admin.post.create')->name('posts.create');
+});
 
 Route::get('/dashboard', function () {
     return view('dashboard');

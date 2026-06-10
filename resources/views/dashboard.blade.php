@@ -28,7 +28,7 @@
                         <div class="p-6">
                             <h3 class="text-lg font-bold mb-2">📝 Kelola Artikel</h3>
                             <p class="text-gray-600 text-sm mb-4">Buat, edit, dan hapus artikel.</p>
-                            <a href="#" class="text-blue-600 hover:underline">Buat Artikel Baru →</a>
+                            <a href="{{ route('posts.create') }}" class="text-blue-600 hover:underline">Buat Artikel Baru →</a>
                             <br>
                             <a href="#" class="text-blue-600 hover:underline">Daftar Semua Artikel →</a>
                         </div>
