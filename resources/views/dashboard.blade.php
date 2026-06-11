@@ -54,7 +54,7 @@
                             <p class="text-gray-600 text-sm mb-4">Tambah, edit, hapus kategori dan tag.</p>
                             <a href="{{ route('categories.index') }}" class="text-blue-600 hover:underline">Kelola Kategori →</a>
                             <br>
-                            <a href="#" class="text-blue-600 hover:underline">Kelola Tag →</a>
+                            <a href="{{ route('tags.index') }}" class="text-blue-600 hover:underline">Kelola Tag →</a>
                         </div>
                     </div>
                 @endcan

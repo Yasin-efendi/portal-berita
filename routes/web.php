@@ -65,6 +65,8 @@ Route::middleware(['auth', 'role:admin,editor,writer'])->group(function () {
     Route::livewire('/admin/posts', 'admin.post.table')->name('posts.index');
 
     Route::livewire('/admin/categories', 'admin.category.manager')->name('categories.index');
+
+    Route::livewire('/admin/tags', 'admin.tag.manager')->name('tags.index');
 });
 
 Route::get('/dashboard', function () {
