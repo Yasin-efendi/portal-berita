@@ -20,6 +20,8 @@ new class extends Component {
     public $allTags = [];
     
     public $successMessage = '';
+
+    public $scheduled_at = '';  // Untuk menyimpan nilai datetime-local
     
     public function mount($post)
     {
@@ -70,13 +72,27 @@ new class extends Component {
             }
             $post->slug = $slug;
         }
+
+                // Di bagian sebelum Post::create atau Post::update
+        $publishedAt = null;
+
+        if ($this->status == 'published') {
+            // Jika publish sekarang
+            $publishedAt = now();
+        } elseif ($this->status == 'draft' && !empty($this->scheduled_at)) {
+            // Jika draft tapi ada jadwal -> status tetap draft, published_at diisi jadwal
+            $publishedAt = \Carbon\Carbon::parse($this->scheduled_at);
+        } else {
+            // Draft tanpa jadwal
+            $publishedAt = null;
+        }
         
         // Update post
         $post->update([
             'title' => $this->title,
             'content' => $this->content,
             'status' => $this->status,
-            'published_at' => $this->status == 'published' && $post->status !== 'published' ? now() : $post->published_at,
+            'published_at' => $publishedAt,
             'category_id' => $this->category_id ?: null,
         ]);
         
@@ -168,6 +184,18 @@ new class extends Component {
                 </label>
             </div>
         </div>
+
+        <!-- ✅ TAMBAHKAN: Jadwalkan Publish (hanya muncul jika status = draft) -->
+        @if($status == 'draft')
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Jadwalkan Publish (Opsional)</label>
+            <input type="datetime-local" wire:model="scheduled_at" 
+                class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            <p class="text-xs text-gray-400 mt-1">
+                Kosongkan jika ingin tetap draft. Isi tanggal/waktu jika ingin publish otomatis nanti.
+            </p>
+        </div>
+        @endif
         
         <!-- Konten -->
         <div>

@@ -18,6 +18,8 @@ new class extends Component {
     public $allTags = [];
     
     public $successMessage = '';
+
+    public $scheduled_at = '';  // Untuk menyimpan nilai datetime-local
     
     public function mount()
     {
@@ -44,6 +46,21 @@ new class extends Component {
         if ($count > 0) {
             $slug = $slug . '-' . time();
         }
+
+        // Di bagian sebelum Post::create atau Post::update
+        $publishedAt = null;
+
+        if ($this->status == 'published') {
+            // Jika publish sekarang
+            $publishedAt = now();
+        } elseif ($this->status == 'draft' && !empty($this->scheduled_at)) {
+            // Jika draft tapi ada jadwal -> status tetap draft, published_at diisi jadwal
+            $publishedAt = \Carbon\Carbon::parse($this->scheduled_at);
+        } else {
+            // Draft tanpa jadwal
+            $publishedAt = null;
+        }
+
         
         // Simpan artikel
         $post = Post::create([
@@ -51,7 +68,7 @@ new class extends Component {
             'slug' => $slug,
             'content' => $this->content,
             'status' => $this->status,
-            'published_at' => $this->status == 'published' ? now() : null,
+            'published_at' => $publishedAt,
             'author_id' => Auth::id(),
             'category_id' => $this->category_id ?: null,
         ]);
@@ -173,6 +190,18 @@ new class extends Component {
                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
             @enderror
         </div>
+
+        <!-- ✅ TAMBAHKAN: Jadwalkan Publish (hanya muncul jika status = draft) -->
+        @if($status == 'draft')
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Jadwalkan Publish (Opsional)</label>
+            <input type="datetime-local" wire:model="scheduled_at" 
+                class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            <p class="text-xs text-gray-400 mt-1">
+                Kosongkan jika ingin tetap draft. Isi tanggal/waktu jika ingin publish otomatis nanti.
+            </p>
+        </div>
+        @endif
         
         <!-- Konten (Textarea) -->
         <div>
