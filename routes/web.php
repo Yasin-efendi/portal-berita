@@ -58,6 +58,13 @@ Route::middleware(['auth', 'role:admin,editor,writer'])->group(function () {
 
     // Route untuk create post
     Route::livewire('admin/posts/create', 'admin.post.create')->name('posts.create');
+
+    // Sementara untuk edit (redirect ke create dulu, nanti akan diperbaiki)
+    Route::livewire('/admin/posts/{post}/edit', 'admin.post.edit')->name('posts.edit');
+
+    Route::livewire('/admin/posts', 'admin.post.table')->name('posts.index');
+
+    Route::livewire('/admin/categories', 'admin.category.manager')->name('categories.index');
 });
 
 Route::get('/dashboard', function () {
